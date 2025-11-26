@@ -153,6 +153,13 @@ function importJSON(data: string) {
         usable: urlToUsable(url.toString()),
       };
 
+      if (i.fileName && i.fileName !== "") {
+        const fileName = i.fileName.toString().trim();
+        if (fileName) {
+          item.fileName = fileName;
+        }
+      }
+
       if (i.referer && i.referer !== "") {
         const referrer = new URL(i.referer).toString();
         item.referrer = referrer;
@@ -363,6 +370,7 @@ class JSONExporter implements Exporter {
       const serialized = {
         url: item.url,
         name: item.currentName,
+        fileName: item.fileName || "",
         subfolder: item.subfolder || "",
         batch: item.batch || 0,
         idx: item.idx || 0,
