@@ -34,6 +34,37 @@ function urlToUsable(u: string) {
   }
 }
 
+function findPrimaryURL(file: Element) {
+  return Array.from(file.querySelectorAll("url")).map(u => {
+    try {
+      const {textContent} = u;
+      if (!textContent) {
+        return null;
+      }
+      const url = new URL(textContent);
+      if (!ALLOWED_SCHEMES.has(url.protocol)) {
+        return null;
+      }
+      const prio = parseNum(u, "priority", 0);
+      return {
+        url,
+        prio
+      };
+    }
+    catch {
+      return null;
+    }
+  }).filter(u => !!u).reduce((p, c) => {
+    if (!c) {
+      return null;
+    }
+    if (!p || p.prio < c.prio) {
+      return c;
+    }
+    return p;
+  });
+}
+
 function importMeta4(data: string) {
   const parser = new DOMParser();
   const document = parser.parseFromString(data, "text/xml");
@@ -42,37 +73,11 @@ function importMeta4(data: string) {
   let batch = 0;
   for (const file of documentElement.querySelectorAll("file")) {
     try {
-      const url = Array.from(file.querySelectorAll("url")).map(u => {
-        try {
-          const {textContent} = u;
-          if (!textContent) {
-            return null;
-          }
-          const url = new URL(textContent);
-          if (!ALLOWED_SCHEMES.has(url.protocol)) {
-            return null;
-          }
-          const prio = parseNum(u, "priority", 0);
-          return {
-            url,
-            prio
-          };
-        }
-        catch {
-          return null;
-        }
-      }).filter(u => !!u).reduce((p, c) => {
-        if (!c) {
-          return null;
-        }
-        if (!p || p.prio < c.prio) {
-          return c;
-        }
-        return p;
-      });
+      const url = findPrimaryURL(file);
       if (!url) {
         continue;
       }
+
       batch = parseNum(file, "num", batch, NS_DTA);
       const idx = parseNum(file, "idx", 0, NS_DTA);
       const item: BaseItem = {
@@ -81,6 +86,14 @@ function importMeta4(data: string) {
         batch,
         idx
       };
+      let fileName = file.getAttribute("name");
+      if (fileName) {
+        fileName = fileName.trim();
+      }
+      if (fileName) {
+        item.fileName = fileName;
+      }
+
       const ref = file.getAttributeNS(NS_DTA, "referrer");
       if (ref) {
         item.referrer = ref;
