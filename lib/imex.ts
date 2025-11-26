@@ -311,7 +311,10 @@ class MetalinkExporter implements Exporter {
     for (const item of items) {
       const anyItem = item as any;
       const f = document.createElementNS(NS_METALINK_RFC5854, "file");
-      f.setAttribute("name", anyItem.currentName);
+      const fileName = anyItem.fileName || anyItem.currentName;
+      if (fileName) {
+        f.setAttribute("name", fileName);
+      }
       if (item.batch) {
         f.setAttributeNS(NS_DTA, "num", item.batch.toString());
       }
