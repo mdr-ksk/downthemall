@@ -123,6 +123,10 @@
     "description": "Table column in manager",
     "message": "Est. Time"
   },
+  "colFileExtension": {
+    "description": "Column header for the File Extension column in the select window",
+    "message": "File Extension"
+  },
   "colNameURL": {
     "description": "Table column in manager",
     "message": "Name/URL"
@@ -335,13 +339,13 @@
     "description": "menu text",
     "message": "Export As aria2 List"
   },
-  "export_metalink": {
-    "description": "menu text",
-    "message": "Export As Metalink"
-  },
   "export_json": {
     "description": "menu text",
     "message": "Export As JSON"
+  },
+  "export_metalink": {
+    "description": "menu text",
+    "message": "Export As Metalink"
   },
   "export_text": {
     "description": "menu text",
